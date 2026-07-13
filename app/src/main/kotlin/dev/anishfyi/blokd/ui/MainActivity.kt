@@ -10,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import dev.anishfyi.blokd.vpn.BlokdVpnService
+import dev.anishfyi.blokd.vpn.VpnController
 
 /**
  * Hosts the Compose UI and owns the two system dialogs BLOKD needs: the VPN
@@ -36,6 +37,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             BlokdApp(
                 onToggle = { enabled -> if (enabled) enableVpn() else disableVpn() },
+                onDnsSettingsChanged = ::restartVpnIfRunning,
             )
         }
     }
@@ -54,6 +56,13 @@ class MainActivity : ComponentActivity() {
     private fun disableVpn() {
         startService(
             Intent(this, BlokdVpnService::class.java).setAction(BlokdVpnService.ACTION_STOP),
+        )
+    }
+
+    private fun restartVpnIfRunning() {
+        if (!VpnController.running.value) return
+        startService(
+            Intent(this, BlokdVpnService::class.java).setAction(BlokdVpnService.ACTION_RESTART),
         )
     }
 }

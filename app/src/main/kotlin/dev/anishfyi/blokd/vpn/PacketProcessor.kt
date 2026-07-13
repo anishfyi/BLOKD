@@ -2,7 +2,7 @@ package dev.anishfyi.blokd.vpn
 
 import dev.anishfyi.blokd.dns.DnsCodec
 import dev.anishfyi.blokd.dns.DnsFilter
-import dev.anishfyi.blokd.dns.UpstreamResolver
+import dev.anishfyi.blokd.dns.DnsResolver
 import dev.anishfyi.blokd.stats.StatsCounter
 
 /**
@@ -17,7 +17,7 @@ import dev.anishfyi.blokd.stats.StatsCounter
  */
 class PacketProcessor(
     private val filter: DnsFilter,
-    private val resolver: UpstreamResolver,
+    private val resolver: DnsResolver,
     private val stats: StatsCounter,
 ) {
     fun process(packet: ByteArray, length: Int): ByteArray? {

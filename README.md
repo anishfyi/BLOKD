@@ -10,7 +10,8 @@ It runs a local VPN on your device and answers DNS for known ad and tracker doma
 
 - No root, no account, no traffic leaves your device except normal DNS lookups.
 - Blocks ad and tracker domains system wide using public block lists (HaGeZi and OISD), updatable in app.
-- One toggle, a live blocked and allowed counter, and an allow list for domains you want to keep.
+- Optional encrypted AdGuard DNS-over-TLS adds a second filtering layer.
+- One main button starts every enabled protection layer, with live blocked and allowed counters.
 
 ## Install
 

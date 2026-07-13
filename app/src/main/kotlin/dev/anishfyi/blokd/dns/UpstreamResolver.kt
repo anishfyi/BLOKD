@@ -14,8 +14,8 @@ class UpstreamResolver(
     private val port: Int = 53,
     private val timeoutMs: Int = 5000,
     private val protect: (DatagramSocket) -> Unit,
-) {
-    fun resolve(query: ByteArray): ByteArray? {
+) : DnsResolver {
+    override fun resolve(query: ByteArray): ByteArray? {
         return try {
             DatagramSocket().use { socket ->
                 protect(socket)
