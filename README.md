@@ -34,6 +34,6 @@ If BLOKD is useful to you, please star the repo. It genuinely helps.
 
 ## License and author
 
-MIT. Author: anishfyi.
+MIT. Author: [anishfyi](https://github.com/anishfyi).
 
 Site: https://anishfyi.github.io/BLOKD/
