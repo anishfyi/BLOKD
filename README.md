@@ -1,6 +1,10 @@
-# BLOKD
+<div align="center">
+  <img src="docs/logo.svg" alt="BLOKD" width="96" height="96" />
+  <h1>BLOKD</h1>
+  <p><b>A no-root Android ad and tracker blocker.</b></p>
+</div>
 
-A no-root Android ad and tracker blocker. It runs a local VPN on your device and answers DNS for known ad and tracker domains with NXDOMAIN, so those hosts never load, across every app and browser.
+It runs a local VPN on your device and answers DNS for known ad and tracker domains with NXDOMAIN, so those hosts never load, across every app and browser.
 
 ## Pointers
 
