@@ -1,0 +1,18 @@
+# Gradle
+.gradle/
+build/
+*/build/
+
+# Android / IDE
+local.properties
+.idea/
+*.iml
+.DS_Store
+captures/
+
+# Signing secrets. Never commit these.
+keystore.properties
+*.jks
+*.keystore
+
+# Gradle wrapper jar is regenerated with `gradle wrapper`

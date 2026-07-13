@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BLOKD</title>
+  <style>
+    :root {
+      --bg: #f7f8f8;
+      --fg: #0e1116;
+      --muted: #5b6570;
+      --card: #ffffff;
+      --border: #e3e7ea;
+      --accent: #0f766e;
+      --accent-fg: #ffffff;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0e1116;
+        --fg: #e7ecef;
+        --muted: #9aa4ad;
+        --card: #161b22;
+        --border: #232a31;
+        --accent: #5eead4;
+        --accent-fg: #0e1116;
+      }
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    main {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 72px 24px 96px;
+    }
+    .brand {
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      font-size: 44px;
+      margin: 0 0 8px;
+    }
+    .tag {
+      color: var(--muted);
+      font-size: 17px;
+      margin: 0 0 36px;
+    }
+    .btn {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--accent-fg);
+      text-decoration: none;
+      font-weight: 700;
+      padding: 12px 22px;
+      border-radius: 10px;
+      font-size: 15px;
+    }
+    .btn.secondary {
+      background: transparent;
+      color: var(--fg);
+      border: 1px solid var(--border);
+      margin-left: 10px;
+    }
+    ul { padding-left: 20px; }
+    li { margin: 6px 0; }
+    h2 {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin: 44px 0 12px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-top: 12px;
+    }
+    code {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1px 6px;
+      font-size: 13px;
+    }
+    a { color: var(--accent); }
+    footer {
+      margin-top: 56px;
+      color: var(--muted);
+      font-size: 13px;
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+    }
+    .star { font-weight: 600; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1 class="brand">BLOKD</h1>
+    <p class="tag">A no-root Android ad and tracker blocker. One local VPN, and known ad domains stop resolving across every app.</p>
+
+    <a class="btn" href="https://github.com/anishfyi/BLOKD/releases/latest">Download APK</a>
+    <a class="btn secondary" href="https://github.com/anishfyi/BLOKD">Source</a>
+
+    <h2>What it does</h2>
+    <ul>
+      <li>Runs a local VPN and answers DNS for ad and tracker domains with NXDOMAIN, so they never load.</li>
+      <li>Works system wide, across every app and browser. No root, no account.</li>
+      <li>Public block lists (HaGeZi and OISD), updatable in app, plus your own allow list.</li>
+    </ul>
+
+    <h2>Install</h2>
+    <div class="card">
+      Download the latest <code>BLOKD-vX.Y.Z.apk</code>, open it, flip the switch, and approve the VPN prompt Android shows. The APK is release signed, so it installs and updates normally.
+    </div>
+
+    <h2>Honest limits</h2>
+    <div class="card">
+      DNS blocking cannot remove ads stitched into a video stream from the same server as the content, which is what most large streaming apps use for in stream ads. It also cannot see encrypted DNS or hardcoded resolver IPs.
+    </div>
+
+    <p class="star" style="margin-top:40px;">If BLOKD is useful to you, please <a href="https://github.com/anishfyi/BLOKD">star the repo</a>. It genuinely helps.</p>
+
+    <footer>
+      MIT licensed. Author: anishfyi.
+    </footer>
+  </main>
+</body>
+</html>
