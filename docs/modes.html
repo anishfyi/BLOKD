@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BLOKD — Protection modes</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="stylesheet" href="site.css" />
+</head>
+<body>
+  <nav>
+    <a href="index.html">Home</a>
+    <a class="active" href="modes.html">Modes</a>
+    <a href="install.html">Install</a>
+    <a href="limitations.html">Limits</a>
+    <a href="https://github.com/anishfyi/BLOKD">GitHub</a>
+  </nav>
+  <main>
+    <h1 class="brand" style="font-size:32px;letter-spacing:0.08em;">Modes</h1>
+    <p class="tag">BLOKD v1.1.0 uses DNS-only VPN routing. Berserk means bigger blocklists, not a full device tunnel.</p>
+
+    <h2>Standard</h2>
+    <div class="card">
+      <ul>
+        <li>HaGeZi Pro Plus Mini wildcard list</li>
+        <li>OISD domainswild2</li>
+        <li>Best for everyday use — strong blocking, lower RAM footprint</li>
+      </ul>
+    </div>
+
+    <h2>Berserk</h2>
+    <div class="card">
+      <ul>
+        <li>Everything in Standard, plus HaGeZi Pro Plus full list</li>
+        <li>More tracker and ad-network domains blocked at DNS level</li>
+        <li>Does <em>not</em> intercept all traffic or encrypted DNS ports (planned for a future release)</li>
+      </ul>
+    </div>
+
+    <h2>Shared layers</h2>
+    <div class="card">
+      <ul>
+        <li><b>Blocklists</b> — bundled snapshot on install, refreshed daily on unmetered Wi‑Fi</li>
+        <li><b>AdGuard DoT</b> — optional encrypted upstream resolver (default on)</li>
+        <li><b>CNAME cloaking filter</b> — blocks answers that chain to tracker domains</li>
+        <li><b>Connectivity allowlist</b> — Android validation hosts are never blocked</li>
+      </ul>
+    </div>
+
+    <footer>
+      <a href="index.html">← Back home</a>
+    </footer>
+  </main>
+</body>
+</html>

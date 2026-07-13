@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BLOKD — Limitations</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="stylesheet" href="site.css" />
+</head>
+<body>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="modes.html">Modes</a>
+    <a href="install.html">Install</a>
+    <a class="active" href="limitations.html">Limits</a>
+    <a href="https://github.com/anishfyi/BLOKD">GitHub</a>
+  </nav>
+  <main>
+    <h1 class="brand" style="font-size:32px;letter-spacing:0.08em;">Limits</h1>
+    <p class="tag">BLOKD is honest about what DNS blocking can and cannot do without root.</p>
+
+    <h2>What DNS blocking cannot fix</h2>
+    <div class="card">
+      <ul>
+        <li><b>Server-side ad insertion (SSAI)</b> — ads served from the same host as video content</li>
+        <li><b>Encrypted DNS bypass</b> — apps using hardcoded DoH/DoT or resolver IPs</li>
+        <li><b>First-party ads</b> — content served from the app's own domain</li>
+        <li><b>Non-DNS connections</b> — direct IP connections that never query blocked names</li>
+      </ul>
+    </div>
+
+    <h2>What v1.1.0 does not do</h2>
+    <div class="card">
+      <ul>
+        <li>Full-tunnel traffic interception (Berserk is aggressive blocklists only)</li>
+        <li>Blocking port 853 (DoT) or 784 (DoQ) at the packet level</li>
+        <li>Root-level hosts file or system-wide firewall rules</li>
+      </ul>
+      <p style="margin:12px 0 0;">Full-tunnel Berserk is planned for a future release.</p>
+    </div>
+
+    <h2>Research</h2>
+    <div class="card">
+      <p>See <a href="https://github.com/anishfyi/BLOKD/blob/main/docs/ott-sonyliv-findings.md">OTT streaming findings</a> for a concrete example of SSAI limits in a major streaming app.</p>
+    </div>
+
+    <footer>
+      <a href="index.html">← Back home</a>
+    </footer>
+  </main>
+</body>
+</html>

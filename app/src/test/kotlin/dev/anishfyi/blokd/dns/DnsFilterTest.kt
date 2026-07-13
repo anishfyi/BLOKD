@@ -16,11 +16,10 @@ class DnsFilterTest {
     }
 
     @Test
-    fun allowListOverridesBlockList() {
+    fun allowListOverridesChildBlock() {
         val filter = DnsFilter()
-        filter.setBlockList(setOf("example.com"))
-        filter.setAllowList(setOf("safe.example.com"))
-        assertTrue(filter.isBlocked("ads.example.com"))
-        assertFalse(filter.isBlocked("safe.example.com"))
+        filter.setBlockList(setOf("ads.example.com"))
+        filter.setAllowList(setOf("example.com"))
+        assertFalse(filter.isBlocked("ads.example.com"))
     }
 }

@@ -5,18 +5,19 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
+import android.net.Network
 import android.net.VpnService
 import android.os.Build
 import android.os.ParcelFileDescriptor
+import android.system.OsConstants
 import androidx.core.app.NotificationCompat
 import dev.anishfyi.blokd.R
 import dev.anishfyi.blokd.block.BlocklistRepository
 import dev.anishfyi.blokd.dns.DnsFilter
-import dev.anishfyi.blokd.dns.DnsOverTlsResolver
 import dev.anishfyi.blokd.dns.DnsPreferences
-import dev.anishfyi.blokd.dns.DnsResolver
-import dev.anishfyi.blokd.dns.UpstreamResolver
-import dev.anishfyi.blokd.stats.StatsCounter
+import dev.anishfyi.blokd.dns.ResolverManager
+import dev.anishfyi.blokd.stats.HealthStatus
+import dev.anishfyi.blokd.stats.ProtectionMode
 import dev.anishfyi.blokd.ui.MainActivity
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -24,12 +25,6 @@ import java.net.DatagramSocket
 import java.net.Socket
 import kotlin.concurrent.thread
 
-/**
- * The local VPN. It routes only the sentinel DNS address into the tunnel, so all
- * other traffic flows normally and no full IP stack is required. Each captured
- * DNS packet is filtered by [PacketProcessor] and either answered with NXDOMAIN
- * or forwarded upstream.
- */
 class BlokdVpnService : VpnService() {
 
     companion object {
@@ -39,20 +34,22 @@ class BlokdVpnService : VpnService() {
 
         private const val CHANNEL_ID = "blokd_vpn"
         private const val NOTIFICATION_ID = 1
-        private const val TUN_ADDRESS = "10.111.222.1"
-        private const val DNS_SENTINEL = "10.111.222.3"
+        private const val TUN_V4 = "10.111.222.1"
+        private const val DNS_V4 = "10.111.222.3"
+        private const val TUN_V6 = "fd00:111:222::1"
+        private const val DNS_V6 = "fd00:111:222::3"
     }
 
     private var tunnel: ParcelFileDescriptor? = null
-
-    @Volatile
-    private var running = false
+    @Volatile private var running = false
     private var worker: Thread? = null
     private var publisher: Thread? = null
-    private var resolver: DnsResolver? = null
+    private var resolver: ResolverManager? = null
+    private var networkTracker: UnderlyingNetworkTracker? = null
 
     private val filter = DnsFilter()
-    private val stats = StatsCounter()
+    private val stats = dev.anishfyi.blokd.stats.StatsCounter()
+    private val blocklists = lazy { BlocklistRepository(this, filter) }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
@@ -71,48 +68,76 @@ class BlokdVpnService : VpnService() {
 
     private fun startTunnel() {
         if (running) return
-        BlocklistRepository(this, filter).loadCachedOrSeed()
+        startForeground(NOTIFICATION_ID, buildNotification())
+        publish(HealthStatus.STARTING)
+
+        val mode = DnsPreferences.protectionMode(this)
+        blocklists.value.loadForMode(mode)
+
+        val tracker = UnderlyingNetworkTracker(this) { network ->
+            setUnderlyingNetworks(network?.let { arrayOf(it) } ?: emptyArray<Network>())
+            resolver?.onNetworkChanged(network)
+        }
+        networkTracker = tracker
+        tracker.start()
 
         val fd = Builder()
             .setSession("BLOKD")
-            .addAddress(TUN_ADDRESS, 24)
-            .addDnsServer(DNS_SENTINEL)
-            .addRoute(DNS_SENTINEL, 32)
+            .setMtu(1280)
+            .addAddress(TUN_V4, 32)
+            .addAddress(TUN_V6, 128)
+            .addDnsServer(DNS_V4)
+            .addDnsServer(DNS_V6)
+            .addRoute(DNS_V4, 32)
+            .addRoute(DNS_V6, 128)
+            .allowFamily(OsConstants.AF_INET)
+            .allowFamily(OsConstants.AF_INET6)
             .setBlocking(true)
-            .establish() ?: run { stopSelf(); return }
+            .setMetered(false)
+            .setUnderlyingNetworks(tracker.currentNetwork()?.let { arrayOf(it) } ?: emptyArray<Network>())
+            .establish() ?: run {
+            publish(HealthStatus.ERROR)
+            stopSelf()
+            return
+        }
 
         tunnel = fd
         running = true
-        startForeground(NOTIFICATION_ID, buildNotification())
-        VpnController.running.value = true
 
-        val activeResolver = if (DnsPreferences.isAdGuardEnabled(this)) {
-            DnsOverTlsResolver(protect = { socket: Socket -> protect(socket) })
-        } else {
-            UpstreamResolver(protect = { socket: DatagramSocket -> protect(socket) })
-        }
+        val activeResolver = ResolverManager(
+            useAdGuard = DnsPreferences.isAdGuardEnabled(this),
+            strictEncryption = DnsPreferences.isStrictEncryption(this),
+            networkTracker = tracker,
+            protectUdp = { socket: DatagramSocket -> protect(socket) },
+            protectTcp = { socket: Socket -> protect(socket) },
+        )
         resolver = activeResolver
         val processor = PacketProcessor(filter, activeResolver, stats)
 
         worker = thread(name = "blokd-packets", isDaemon = true) {
             runPacketLoop(fd, processor)
+            if (running) {
+                running = false
+                publish(HealthStatus.ERROR)
+            }
         }
         publisher = thread(name = "blokd-stats", isDaemon = true) {
             while (running) {
-                VpnController.stats.value = stats.snapshot()
+                publish(HealthStatus.HEALTHY)
                 try {
                     Thread.sleep(1000)
-                } catch (e: InterruptedException) {
+                } catch (_: InterruptedException) {
                     break
                 }
             }
         }
+        publish(HealthStatus.HEALTHY)
     }
 
     private fun runPacketLoop(fd: ParcelFileDescriptor, processor: PacketProcessor) {
         val input = FileInputStream(fd.fileDescriptor)
         val output = FileOutputStream(fd.fileDescriptor)
-        val buffer = ByteArray(32767)
+        val buffer = ByteArray(65_535)
         try {
             while (running) {
                 val n = input.read(buffer)
@@ -120,8 +145,8 @@ class BlokdVpnService : VpnService() {
                 val response = processor.process(buffer, n) ?: continue
                 output.write(response)
             }
-        } catch (e: Exception) {
-            // Interface torn down or read interrupted. Exit the loop quietly.
+        } catch (_: Exception) {
+            // TUN closed or interrupted.
         }
     }
 
@@ -137,22 +162,47 @@ class BlokdVpnService : VpnService() {
         publisher?.interrupt()
         resolver?.close()
         resolver = null
-        try {
-            tunnel?.close()
-        } catch (e: Exception) {
-            // Already closed.
-        }
+        networkTracker?.stop()
+        networkTracker = null
+        runCatching { tunnel?.close() }
         tunnel = null
-        VpnController.running.value = false
+        publish(HealthStatus.OFF)
         if (stopService) {
             stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
         }
     }
 
+    override fun onRevoke() {
+        stopTunnel()
+        super.onRevoke()
+    }
+
     override fun onDestroy() {
         stopTunnel(stopService = false)
         super.onDestroy()
+    }
+
+    private fun publish(status: HealthStatus) {
+        val mode = DnsPreferences.protectionMode(this)
+        val adGuard = DnsPreferences.isAdGuardEnabled(this)
+        val upstream = resolver?.upstreamLabel() ?: if (adGuard) "AdGuard DoT" else "System DNS"
+        val effectiveStatus = when {
+            status == HealthStatus.HEALTHY && networkTracker?.currentNetwork() == null -> HealthStatus.NO_NETWORK
+            else -> status
+        }
+        VpnController.publish(
+            status = effectiveStatus,
+            mode = mode,
+            adGuardEnabled = adGuard,
+            blocklist = blocklists.value.meta(),
+            stats = stats.snapshot(),
+            upstreamLabel = upstream,
+        )
+        val manager = getSystemService(NotificationManager::class.java)
+        if (running) {
+            manager.notify(NOTIFICATION_ID, buildNotification())
+        }
     }
 
     private fun buildNotification(): Notification {
@@ -168,15 +218,25 @@ class BlokdVpnService : VpnService() {
             Intent(this, MainActivity::class.java),
             PendingIntent.FLAG_IMMUTABLE,
         )
-        return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("BLOKD is on")
-            .setContentText(
-                if (DnsPreferences.isAdGuardEnabled(this)) {
-                    "BLOKD + encrypted AdGuard DNS"
-                } else {
-                    "Blocking ad and tracker domains"
+        val mode = DnsPreferences.protectionMode(this)
+        val count = filter.blockedCount()
+        val text = buildString {
+            append(
+                when (mode) {
+                    ProtectionMode.BERSERK -> "Berserk"
+                    ProtectionMode.STANDARD -> "Standard"
                 },
             )
+            append(" · ")
+            append(count)
+            append(" domains")
+            if (DnsPreferences.isAdGuardEnabled(this@BlokdVpnService)) {
+                append(" · AdGuard DoT")
+            }
+        }
+        return NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("BLOKD protection is on")
+            .setContentText(text)
             .setSmallIcon(R.drawable.ic_stat_shield)
             .setContentIntent(intent)
             .setOngoing(true)

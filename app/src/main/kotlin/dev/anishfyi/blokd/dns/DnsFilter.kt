@@ -22,9 +22,18 @@ class DnsFilter {
     fun isBlocked(domain: String): Boolean {
         val allow = allowSet.get()
         val block = blockSet.get()
-        var candidate = domain.lowercase().trimEnd('.')
+        val normalized = domain.lowercase().trimEnd('.')
+
+        var candidate = normalized
         while (true) {
             if (allow.contains(candidate)) return false
+            val dot = candidate.indexOf('.')
+            if (dot < 0) break
+            candidate = candidate.substring(dot + 1)
+        }
+
+        candidate = normalized
+        while (true) {
             if (block.contains(candidate)) return true
             val dot = candidate.indexOf('.')
             if (dot < 0) return false

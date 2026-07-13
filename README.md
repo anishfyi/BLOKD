@@ -4,12 +4,23 @@
   <p><b>A no-root Android ad and tracker blocker.</b></p>
 </div>
 
-It runs a local VPN on your device and answers DNS for known ad and tracker domains with NXDOMAIN, so those hosts never load, across every app and browser.
+It runs a local DNS-only VPN on your device and answers DNS for known ad and tracker domains with NXDOMAIN, so those hosts never load — across every app and browser.
+
+## What's new in v1.1.0
+
+- **560k+ bundled blocklist** (HaGeZi + OISD) on first install, with daily CDN refresh via WorkManager
+- **Dual-stack IPv4/IPv6 VPN** — fixes false "no internet" warnings while browsing still works
+- **Standard / Berserk modes** — Berserk adds the full HaGeZi Pro list (aggressive DNS blocking, not full-tunnel)
+- **CNAME cloaking filter** — blocks upstream answers that chain to tracker domains
+- **Async resolver** with AdGuard DoT + system DNS fallback; SERVFAIL instead of silent drops
+- **Redesigned UI** — health banner, mode cards, live session stats
+
+Site: https://anishfyi.github.io/BLOKD/ · [Modes](docs/modes.html) · [Install](docs/install.html) · [Limitations](docs/limitations.html)
 
 ## Pointers
 
-- No root, no account, no traffic leaves your device except normal DNS lookups.
-- Blocks ad and tracker domains system wide using public block lists (HaGeZi and OISD), updatable in app.
+- No root, no account. DNS queries go to your chosen upstream (AdGuard DoT or system DNS).
+- Blocks ad and tracker domains system-wide using public block lists, updatable in app.
 - Optional encrypted AdGuard DNS-over-TLS adds a second filtering layer.
 - One main button starts every enabled protection layer, with live blocked and allowed counters.
 
@@ -17,7 +28,7 @@ It runs a local VPN on your device and answers DNS for known ad and tracker doma
 
 1. Download the latest signed `BLOKD-vX.Y.Z.apk` from [Releases](https://github.com/anishfyi/BLOKD/releases/latest).
 2. Open it and allow install from your browser or files app.
-3. Launch BLOKD, flip the switch, and approve the VPN prompt Android shows.
+3. Launch BLOKD, pick Standard or Berserk, flip the switch, and approve the VPN prompt.
 
 Play Protect may show a standard "unknown developer" notice for any sideloaded app. The APK is release signed, so it installs and updates normally once you continue past that notice.
 
@@ -31,7 +42,7 @@ Release builds are signed by CI from repository secrets. See `.github/workflows/
 
 ## Limitations
 
-DNS blocking cannot remove ads that are stitched into a video stream from the same server as the content (server side ad insertion), which is what most large streaming apps now use for in stream ads. It also cannot see apps that use encrypted DNS (DoH or DoT) or hardcoded resolver IPs. See `docs/ott-sonyliv-findings.md`.
+DNS blocking cannot remove ads stitched into a video stream from the same server as the content (server-side ad insertion). It also cannot see apps that use encrypted DNS (DoH/DoT) or hardcoded resolver IPs. Berserk in v1.1.0 means bigger blocklists, not full-tunnel interception. See [limitations](docs/limitations.html) and `docs/ott-sonyliv-findings.md`.
 
 ## Star
 
@@ -40,5 +51,3 @@ If BLOKD is useful to you, please star the repo. It genuinely helps.
 ## License and author
 
 MIT. Author: [anishfyi](https://github.com/anishfyi).
-
-Site: https://anishfyi.github.io/BLOKD/

@@ -24,4 +24,17 @@ class HostsParserTest {
         assertFalse(set.contains("localhost"))
         assertFalse(set.contains("not_a_domain"))
     }
+
+    @Test
+    fun parsesOisdPlainDomainLines() {
+        val lines = sequenceOf(
+            "doubleclick.net",
+            "adservice.google.com",
+            "# comment",
+            "",
+        )
+        val set = HostsParser.parse(lines)
+        assertTrue(set.contains("doubleclick.net"))
+        assertTrue(set.contains("adservice.google.com"))
+    }
 }

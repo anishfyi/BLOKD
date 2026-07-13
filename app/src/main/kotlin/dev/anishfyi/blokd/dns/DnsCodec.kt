@@ -38,13 +38,15 @@ object DnsCodec {
      * into a reply, clearing the answer counts, and setting RCODE = 3. The
      * question section is left intact so resolvers accept the answer.
      */
-    fun buildNxDomainResponse(query: ByteArray): ByteArray {
+    fun buildNxDomainResponse(query: ByteArray): ByteArray = buildErrorResponse(query, rcode = 3)
+
+    /** Immediate resolver failure — never leave the client waiting. */
+    fun buildServFailResponse(query: ByteArray): ByteArray = buildErrorResponse(query, rcode = 2)
+
+    private fun buildErrorResponse(query: ByteArray, rcode: Int): ByteArray {
         val r = query.copyOf()
-        // Byte 2: set QR = 1 (response), keep Opcode and the RD bit.
         r[2] = (r[2].toInt() or 0x80).toByte()
-        // Byte 3: RA = 1, Z = 0, RCODE = 3 (NXDOMAIN).
-        r[3] = 0x83.toByte()
-        // ANCOUNT, NSCOUNT, ARCOUNT = 0. QDCOUNT (bytes 4 and 5) is preserved.
+        r[3] = ((r[3].toInt() and 0xF0) or 0x80 or (rcode and 0x0F)).toByte()
         r[6] = 0; r[7] = 0
         r[8] = 0; r[9] = 0
         r[10] = 0; r[11] = 0

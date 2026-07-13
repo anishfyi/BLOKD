@@ -2,59 +2,79 @@ package dev.anishfyi.blokd.block
 
 import android.content.Context
 import dev.anishfyi.blokd.dns.DnsFilter
-import java.io.File
+import dev.anishfyi.blokd.stats.ProtectionMode
 import java.net.HttpURLConnection
 import java.net.URL
 
 /**
- * Loads the active block list into the [DnsFilter]. On first run a small seed
- * list ships in the app so blocking works immediately; [update] pulls the full
- * public lists and caches them on disk for next launch. The allow list is stored
- * separately so user exceptions survive block-list updates.
+ * Loads aggressive public blocklists into [DnsFilter]. Ships a bundled snapshot,
+ * refreshes from CDN sources on demand, and always preserves connectivity-check
+ * allow entries.
  */
 class BlocklistRepository(
     private val context: Context,
     private val filter: DnsFilter,
 ) {
-    private val cacheFile: File get() = File(context.filesDir, "blocklist.txt")
-    private val allowFile: File get() = File(context.filesDir, "allowlist.txt")
-
-    val sources = listOf(
-        "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/pro.txt",
-        "https://big.oisd.nl/",
-    )
-
-    fun loadCachedOrSeed() {
-        val text = if (cacheFile.exists()) cacheFile.readText() else SEED.joinToString("\n")
-        filter.setBlockList(HostsParser.parse(text.lineSequence()))
-        filter.setAllowList(loadAllowList())
+    fun loadForMode(mode: ProtectionMode): Int {
+        val domains = BlocklistStore.loadCachedDomains(context)
+            ?: BlocklistStore.loadBundledDomains(context)
+            ?: HostsParser.parse(SEED.asSequence())
+        apply(mode, domains)
+        return filter.blockedCount()
     }
 
-    /** Downloads every source, merges, caches, and swaps into the filter. Returns the domain count. */
-    fun update(): Int {
-        val merged = HashSet<String>()
-        for (url in sources) {
-            runCatching { merged += HostsParser.parse(download(url).lineSequence()) }
+    fun update(mode: ProtectionMode = ProtectionMode.STANDARD): Int {
+        val sources = when (mode) {
+            ProtectionMode.STANDARD -> BlocklistSources.STANDARD
+            ProtectionMode.BERSERK -> BlocklistSources.BERSERK
         }
-        if (merged.isEmpty()) return filter.blockedCount()
-        cacheFile.writeText(merged.joinToString("\n"))
-        filter.setBlockList(merged)
+        val merged = LinkedHashSet<String>()
+        for (url in sources) {
+            runCatching {
+                merged += HostsParser.parse(download(url).lineSequence())
+            }
+        }
+        if (merged.size < 1_000) {
+            return filter.blockedCount()
+        }
+        BlocklistStore.writeCache(context, merged, mode.name)
+        apply(mode, merged)
         return merged.size
     }
 
-    fun loadAllowList(): Set<String> =
-        if (allowFile.exists()) allowFile.readLines().map { it.trim().lowercase() }.filter { it.isNotEmpty() }.toSet()
-        else emptySet()
+    fun meta() = BlocklistStore.readMeta(context).copy(
+        domainCount = filter.blockedCount(),
+    )
+
+    fun loadAllowList(): Set<String> {
+        val user = if (allowFile.exists()) {
+            allowFile.readLines().map { it.trim().lowercase() }.filter { it.isNotEmpty() }.toSet()
+        } else {
+            emptySet()
+        }
+        return user + BlocklistSources.CONNECTIVITY_ALLOW
+    }
 
     fun setAllowList(domains: Set<String>) {
-        allowFile.writeText(domains.joinToString("\n"))
-        filter.setAllowList(domains)
+        val withoutSystem = domains.filter { it !in BlocklistSources.CONNECTIVITY_ALLOW }.toSet()
+        allowFile.writeText(withoutSystem.joinToString("\n"))
+        filter.setAllowList(withoutSystem + BlocklistSources.CONNECTIVITY_ALLOW)
     }
+
+    private fun apply(mode: ProtectionMode, domains: Set<String>) {
+        filter.setBlockList(domains)
+        filter.setAllowList(loadAllowList())
+        if (domains.size >= 1_000) {
+            BlocklistStore.writeCache(context, domains, mode.name)
+        }
+    }
+
+    private val allowFile get() = java.io.File(context.filesDir, "allowlist.txt")
 
     private fun download(url: String): String {
         val conn = (URL(url).openConnection() as HttpURLConnection).apply {
-            connectTimeout = 15000
-            readTimeout = 30000
+            connectTimeout = 20_000
+            readTimeout = 120_000
             requestMethod = "GET"
             instanceFollowRedirects = true
         }
@@ -62,20 +82,27 @@ class BlocklistRepository(
     }
 
     companion object {
-        // Small seed so common ad hosts are blocked before the first update.
         val SEED = listOf(
-            "0.0.0.0 doubleclick.net",
-            "0.0.0.0 googlesyndication.com",
-            "0.0.0.0 pagead2.googlesyndication.com",
-            "0.0.0.0 google-analytics.com",
-            "0.0.0.0 googleadservices.com",
-            "0.0.0.0 adservice.google.com",
-            "0.0.0.0 adnxs.com",
-            "0.0.0.0 amazon-adsystem.com",
-            "0.0.0.0 app-measurement.com",
-            "0.0.0.0 ads.yahoo.com",
-            "0.0.0.0 scorecardresearch.com",
-            "0.0.0.0 moatads.com",
+            "doubleclick.net",
+            "googlesyndication.com",
+            "pagead2.googlesyndication.com",
+            "google-analytics.com",
+            "googleadservices.com",
+            "adservice.google.com",
+            "adnxs.com",
+            "amazon-adsystem.com",
+            "app-measurement.com",
+            "ads.yahoo.com",
+            "scorecardresearch.com",
+            "moatads.com",
+            "facebook.net",
+            "taboola.com",
+            "outbrain.com",
+            "criteo.com",
+            "pubmatic.com",
+            "rubiconproject.com",
+            "openx.net",
+            "adsafeprotected.com",
         )
     }
 }

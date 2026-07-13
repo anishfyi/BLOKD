@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BLOKD — Install</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="stylesheet" href="site.css" />
+</head>
+<body>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="modes.html">Modes</a>
+    <a class="active" href="install.html">Install</a>
+    <a href="limitations.html">Limits</a>
+    <a href="https://github.com/anishfyi/BLOKD">GitHub</a>
+  </nav>
+  <main>
+    <h1 class="brand" style="font-size:32px;letter-spacing:0.08em;">Install</h1>
+    <p class="tag">Sideload the signed APK from GitHub Releases.</p>
+
+    <h2>Steps</h2>
+    <ol>
+      <li>Download the latest <code>BLOKD-vX.Y.Z.apk</code> from <a href="https://github.com/anishfyi/BLOKD/releases/latest">Releases</a>.</li>
+      <li>Open the APK in your browser or Files app and allow installation from that source.</li>
+      <li>Launch BLOKD, pick Standard or Berserk, and flip the protection switch.</li>
+      <li>Approve the Android VPN permission prompt — BLOKD needs it to filter DNS locally.</li>
+      <li>Optionally enable AdGuard DNS-over-TLS for encrypted upstream resolution.</li>
+    </ol>
+
+    <h2>Play Protect</h2>
+    <div class="card">
+      Play Protect may show an "unknown developer" notice for any sideloaded app. The APK is release-signed by CI, so it installs and updates normally once you continue past that notice.
+    </div>
+
+    <h2>Updating</h2>
+    <div class="card">
+      Download the newer APK and install over the existing app. Your settings are preserved. Blocklists refresh automatically on unmetered networks; tap <b>Update lists</b> in the app to force a refresh.
+    </div>
+
+    <h2>Build from source</h2>
+    <div class="card">
+      <code>gradle :app:assembleDebug</code>
+      <p style="margin:12px 0 0;">Release builds are signed by GitHub Actions. See <code>.github/workflows/release.yml</code>.</p>
+    </div>
+
+    <footer>
+      <a href="index.html">← Back home</a>
+    </footer>
+  </main>
+</body>
+</html>
