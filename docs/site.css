@@ -48,14 +48,6 @@ main {
   margin: 0 auto;
   padding: 48px 24px 96px;
 }
-.hero-banner {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: 12px;
-  margin-bottom: 32px;
-  border: 1px solid var(--border);
-}
 .brand {
   font-weight: 800;
   letter-spacing: 0.14em;
