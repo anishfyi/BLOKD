@@ -6,7 +6,7 @@
 
 It runs a local DNS-only VPN on your device and answers DNS for known ad and tracker domains with NXDOMAIN, so those hosts never load across every app and browser.
 
-## What's new in v1.1.0
+## What's new in v1.1.3
 
 - **560k+ bundled blocklist** (HaGeZi + OISD) on first install, with daily CDN refresh via WorkManager
 - **Dual-stack IPv4/IPv6 VPN:** fixes false "no internet" warnings while browsing still works
