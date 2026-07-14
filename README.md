@@ -26,7 +26,7 @@ Site: https://anishfyi.github.io/BLOKD/ · [Modes](docs/modes.html) · [Install]
 
 ## Install
 
-1. Download the latest signed `BLOKD-vX.Y.Z.apk` from [Releases](https://github.com/anishfyi/BLOKD/releases/latest).
+1. Download [BLOKD-v1.1.2.apk](https://github.com/anishfyi/BLOKD/releases/download/v1.1.2/BLOKD-v1.1.2.apk) or browse [all releases](https://github.com/anishfyi/BLOKD/releases/tag/v1.1.2).
 2. Open it and allow install from your browser or files app.
 3. Launch BLOKD, pick Standard or Berserk, flip the switch, and approve the VPN prompt.
 
