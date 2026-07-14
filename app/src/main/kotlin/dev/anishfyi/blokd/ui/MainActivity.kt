@@ -9,7 +9,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.lifecycle.lifecycleScope
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import dev.anishfyi.blokd.block.BlocklistRepository
@@ -20,9 +25,11 @@ import dev.anishfyi.blokd.stats.HealthStatus
 import dev.anishfyi.blokd.vpn.BlokdVpnService
 import dev.anishfyi.blokd.vpn.VpnController
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
+
+    private var keepSplashVisible = true
 
     private val prepareVpn = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
@@ -35,37 +42,45 @@ class MainActivity : ComponentActivity() {
     ) { /* optional */ }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen().setKeepOnScreenCondition { keepSplashVisible }
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestNotify.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
-        preloadBlocklists()
         setContent {
-            BlokdApp(
-                onToggle = { enabled -> if (enabled) enableVpn() else disableVpn() },
-                onSettingsChanged = ::restartVpnIfRunning,
-                onUpdateLists = ::enqueueBlocklistUpdate,
-            )
+            var ready by remember { mutableStateOf(false) }
+            if (!ready) {
+                BlokdSplashScreen()
+            } else {
+                BlokdApp(
+                    onToggle = { enabled -> if (enabled) enableVpn() else disableVpn() },
+                    onSettingsChanged = ::restartVpnIfRunning,
+                    onUpdateLists = ::enqueueBlocklistUpdate,
+                )
+            }
+            LaunchedEffect(Unit) {
+                withContext(Dispatchers.IO) { preloadBlocklists() }
+                ready = true
+                keepSplashVisible = false
+            }
         }
     }
 
     private fun preloadBlocklists() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val filter = DnsFilter()
-            val repo = BlocklistRepository(this@MainActivity, filter)
-            val mode = DnsPreferences.protectionMode(this@MainActivity)
-            val count = repo.loadForMode(mode)
-            val current = VpnController.state.value
-            VpnController.publish(
-                status = current.status,
-                mode = mode,
-                adGuardEnabled = DnsPreferences.isAdGuardEnabled(this@MainActivity),
-                blocklist = repo.meta().copy(domainCount = count),
-                stats = current.stats,
-                upstreamLabel = current.upstreamLabel,
-            )
-        }
+        val filter = DnsFilter()
+        val repo = BlocklistRepository(this, filter)
+        val mode = DnsPreferences.protectionMode(this)
+        val count = repo.loadForMode(mode)
+        val current = VpnController.state.value
+        VpnController.publish(
+            status = current.status,
+            mode = mode,
+            adGuardEnabled = DnsPreferences.isAdGuardEnabled(this),
+            blocklist = repo.meta().copy(domainCount = count),
+            stats = current.stats,
+            upstreamLabel = current.upstreamLabel,
+        )
     }
 
     private fun enableVpn() {

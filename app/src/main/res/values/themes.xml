@@ -8,4 +8,16 @@
         <item name="android:windowLightNavigationBar">true</item>
         <item name="android:windowBackground">#F6F3EC</item>
     </style>
+
+    <style name="Theme.BLOKD.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_black</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_icon</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/splash_black</item>
+        <item name="postSplashScreenTheme">@style/Theme.BLOKD</item>
+        <item name="android:windowBackground">@color/splash_black</item>
+        <item name="android:statusBarColor">@color/splash_black</item>
+        <item name="android:navigationBarColor">@color/splash_black</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
 </resources>
