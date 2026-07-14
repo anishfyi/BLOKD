@@ -40,7 +40,7 @@ object DnsCodec {
      */
     fun buildNxDomainResponse(query: ByteArray): ByteArray = buildErrorResponse(query, rcode = 3)
 
-    /** Immediate resolver failure — never leave the client waiting. */
+    /** Immediate resolver failure. Never leave the client waiting. */
     fun buildServFailResponse(query: ByteArray): ByteArray = buildErrorResponse(query, rcode = 2)
 
     private fun buildErrorResponse(query: ByteArray, rcode: Int): ByteArray {

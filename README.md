@@ -4,16 +4,16 @@
   <p><b>A no-root Android ad and tracker blocker.</b></p>
 </div>
 
-It runs a local DNS-only VPN on your device and answers DNS for known ad and tracker domains with NXDOMAIN, so those hosts never load — across every app and browser.
+It runs a local DNS-only VPN on your device and answers DNS for known ad and tracker domains with NXDOMAIN, so those hosts never load across every app and browser.
 
 ## What's new in v1.1.0
 
 - **560k+ bundled blocklist** (HaGeZi + OISD) on first install, with daily CDN refresh via WorkManager
-- **Dual-stack IPv4/IPv6 VPN** — fixes false "no internet" warnings while browsing still works
-- **Standard / Berserk modes** — Berserk adds the full HaGeZi Pro list (aggressive DNS blocking, not full-tunnel)
-- **CNAME cloaking filter** — blocks upstream answers that chain to tracker domains
+- **Dual-stack IPv4/IPv6 VPN:** fixes false "no internet" warnings while browsing still works
+- **Standard / Berserk modes:** Berserk adds the full HaGeZi Pro list (aggressive DNS blocking, not full-tunnel)
+- **CNAME cloaking filter:** blocks upstream answers that chain to tracker domains
 - **Async resolver** with AdGuard DoT + system DNS fallback; SERVFAIL instead of silent drops
-- **Redesigned UI** — health banner, mode cards, live session stats
+- **Redesigned UI:** health banner, mode cards, live session stats
 
 Site: https://anishfyi.github.io/BLOKD/ · [Modes](docs/modes.html) · [Install](docs/install.html) · [Limitations](docs/limitations.html)
 
