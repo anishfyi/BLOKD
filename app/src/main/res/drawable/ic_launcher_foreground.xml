@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  BLOKD launcher foreground: Bodoni Moda–inspired "B" monogram with a hairline shield.
+  Letterform paths traced from Bodoni Moda Bold (SIL OFL 1.1); not an embedded font file.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Subtle shield / block motif (editorial hairline) -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M54,24.5L77,34v19.5c0,15 -12.5,27 -23,33c-10.5,-6 -23,-18 -23,-33V34Z"
+        android:strokeWidth="1.1"
+        android:strokeColor="@color/ic_launcher_foreground"
+        android:strokeAlpha="0.22" />
+
+    <!-- Capital B inspired by Bodoni Moda 700 (Didone / fashion-house contrast) -->
+    <path
+        android:fillColor="@color/ic_launcher_foreground"
+        android:pathData="M30.09,81.5V80.04H54.77Q57.79,80.04 60.16,78.35Q62.53,76.65 63.87,73.45Q65.22,70.26 65.22,65.82Q65.22,61.38 63.87,58.67Q62.53,55.96 60.16,54.73Q57.79,53.5 54.77,53.5H46.55V52.53H57.04Q62.87,52.53 67.59,53.87Q72.31,55.22 75.11,58.28Q77.91,61.34 77.91,66.57Q77.91,74.71 72.41,78.1Q66.9,81.5 57.04,81.5ZM36.85,80.83V26.17H48.46V80.83ZM46.55,52.98V52H54.02Q56.67,52 58.89,50.89Q61.11,49.77 62.44,47.15Q63.76,44.54 63.76,40.1Q63.76,35.65 62.44,32.74Q61.11,29.83 58.89,28.39Q56.67,26.96 54.02,26.96H30.09V25.5H55.55Q64.85,25.5 70.28,28.77Q75.71,32.03 75.71,39.31Q75.71,46.29 70.56,49.64Q65.41,52.98 55.55,52.98Z" />
+</vector>

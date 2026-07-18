@@ -2,4 +2,7 @@
 <resources>
     <color name="splash_black">#000000</color>
     <color name="splash_white">#FFFFFF</color>
+    <!-- Adaptive launcher: warm near-black plate behind the ivory monogram -->
+    <color name="ic_launcher_background">#0E0D0C</color>
+    <color name="ic_launcher_foreground">#F3EEE6</color>
 </resources>

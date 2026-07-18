@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="docs/logo.png" alt="BLOKD" width="96" height="96" />
+  <img src="docs/logo.svg" alt="BLOKD" width="96" height="96" />
   <h1>BLOKD</h1>
   <p><b>A no-root Android ad and tracker blocker.</b></p>
 </div>
