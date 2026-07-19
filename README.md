@@ -6,7 +6,11 @@
   <p><b>A no-root Android ad and tracker blocker.</b></p>
 </div>
 
+---
+
 It runs a local DNS-only VPN on your device and answers DNS for known ad and tracker domains with NXDOMAIN, so those hosts never load across every app and browser.
+
+---
 
 ## What's new in v1.1.3
 
