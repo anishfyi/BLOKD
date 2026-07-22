@@ -1,6 +1,4 @@
 <div align="center">
-  <img src="docs/logo.svg" alt="BLOKD" width="88" height="88" />
-  <br><br>
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/blokd-wordmark-dark.svg">
     <img alt="BLOKD" src="docs/blokd-wordmark-light.svg" width="240">
