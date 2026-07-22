@@ -1,14 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <rect width="512" height="512" rx="116" fill="#0b0b0b"/>
-  <g fill="#f7f7f7">
-    <rect x="150" y="112" width="66" height="288" rx="16"/>
-    <path d="M 188 112 H 300 A 74 74 0 0 1 300 260 H 188 Z"/>
-    <path d="M 188 252 H 300 A 76 76 0 0 1 300 400 H 188 Z"/>
-  </g>
-  <g fill="#0b0b0b">
-    <!-- top counter: lower edge is a diagonal sloping down to the left -->
-    <path d="M 212 152 H 296 V 218 L 212 262 Z"/>
-    <!-- bottom counter: upper edge is a parallel diagonal (same slope) -->
-    <path d="M 212 292 L 296 250 V 360 H 212 Z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="BLOKD">
+  <rect width="512" height="512" rx="116" fill="#000000"/>
+  <g transform="translate(-40,0)">
+    <g fill="#FFFFFF">
+      <rect x="150" y="112" width="66" height="288" rx="16"/>
+      <path d="M 188 112 H 300 A 74 74 0 0 1 300 260 H 188 Z"/>
+      <path d="M 188 252 H 300 A 76 76 0 0 1 300 400 H 188 Z"/>
+    </g>
+    <g fill="#000000">
+      <path d="M 212 152 H 296 V 218 L 212 262 Z"/>
+      <path d="M 212 292 L 296 250 V 360 H 212 Z"/>
+    </g>
+    <circle cx="412" cy="372" r="30" fill="#FF6B3D"/>
   </g>
 </svg>

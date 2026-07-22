@@ -16,6 +16,7 @@ import dev.anishfyi.blokd.block.BlocklistRepository
 import dev.anishfyi.blokd.dns.DnsFilter
 import dev.anishfyi.blokd.dns.DnsPreferences
 import dev.anishfyi.blokd.dns.ResolverManager
+import dev.anishfyi.blokd.dns.ResolverTier
 import dev.anishfyi.blokd.stats.HealthStatus
 import dev.anishfyi.blokd.stats.ProtectionMode
 import dev.anishfyi.blokd.ui.MainActivity
@@ -38,6 +39,28 @@ class BlokdVpnService : VpnService() {
         private const val DNS_V4 = "10.111.222.3"
         private const val TUN_V6 = "fd00:111:222::1"
         private const val DNS_V6 = "fd00:111:222::3"
+
+        // Public resolvers that apps hardcode. Routed into the TUN so
+        // PacketProcessor can filter UDP:53 (and drop DoH/DoT to these IPs).
+        // AdGuard (94.140.x) and Mullvad (194.242.2.x) are deliberately excluded.
+        private val PUBLIC_DNS_V4 = listOf(
+            "8.8.8.8",
+            "8.8.4.4",
+            "1.1.1.1",
+            "1.0.0.1",
+            "9.9.9.9",
+            "149.112.112.112",
+            "208.67.222.222",
+            "208.67.220.220",
+        )
+        private val PUBLIC_DNS_V6 = listOf(
+            "2001:4860:4860::8888",
+            "2001:4860:4860::8844",
+            "2606:4700:4700::1111",
+            "2606:4700:4700::1001",
+            "2620:fe::fe",
+            "2620:fe::9",
+        )
     }
 
     private var tunnel: ParcelFileDescriptor? = null
@@ -90,6 +113,10 @@ class BlokdVpnService : VpnService() {
             .addDnsServer(DNS_V6)
             .addRoute(DNS_V4, 32)
             .addRoute(DNS_V6, 128)
+            .apply {
+                PUBLIC_DNS_V4.forEach { addRoute(it, 32) }
+                PUBLIC_DNS_V6.forEach { addRoute(it, 128) }
+            }
             .allowFamily(OsConstants.AF_INET)
             .allowFamily(OsConstants.AF_INET6)
             .setBlocking(true)
@@ -187,8 +214,15 @@ class BlokdVpnService : VpnService() {
         val mode = DnsPreferences.protectionMode(this)
         val adGuard = DnsPreferences.isAdGuardEnabled(this)
         val upstream = resolver?.upstreamLabel() ?: if (adGuard) "AdGuard DoT" else "System DNS"
+        val tier = resolver?.currentTier()
         val effectiveStatus = when {
             status == HealthStatus.HEALTHY && networkTracker?.currentNetwork() == null -> HealthStatus.NO_NETWORK
+            // AdGuard is on but the primary encrypted resolver is not the one
+            // answering: protection is degraded (fell back to a secondary
+            // encrypted or an unfiltered upstream). Surface it instead of a
+            // false "Healthy".
+            status == HealthStatus.HEALTHY && adGuard && tier != null && tier != ResolverTier.PRIMARY ->
+                HealthStatus.DEGRADED
             else -> status
         }
         VpnController.publish(

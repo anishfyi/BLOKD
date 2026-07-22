@@ -8,7 +8,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 
@@ -21,7 +24,10 @@ fun BlokdSplashScreen() {
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = "BLOKD.",
+            text = buildAnnotatedString {
+                append("BLOKD")
+                withStyle(SpanStyle(color = BlokdOrange)) { append(".") }
+            },
             color = Color.White,
             fontSize = 34.sp,
             fontWeight = FontWeight.Bold,

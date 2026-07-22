@@ -62,7 +62,7 @@ class BlocklistRepository(
     }
 
     private fun apply(mode: ProtectionMode, domains: Set<String>) {
-        filter.setBlockList(domains)
+        filter.setBlockList(domains + BlocklistSources.ANTI_BYPASS)
         filter.setAllowList(loadAllowList())
         if (domains.size >= 1_000) {
             BlocklistStore.writeCache(context, domains, mode.name)

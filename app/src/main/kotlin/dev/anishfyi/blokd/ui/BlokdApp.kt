@@ -48,7 +48,10 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -237,12 +240,28 @@ private fun AppHeader() {
             shape = RoundedCornerShape(11.dp),
         ) {
             Box(contentAlignment = Alignment.Center) {
-                Text("B", color = MaterialTheme.colorScheme.background, fontSize = 19.sp, fontWeight = FontWeight.Black)
+                Text(
+                    text = buildAnnotatedString {
+                        append("B")
+                        withStyle(SpanStyle(color = BlokdOrange)) { append(".") }
+                    },
+                    color = MaterialTheme.colorScheme.background,
+                    fontSize = 19.sp,
+                    fontWeight = FontWeight.Black,
+                )
             }
         }
         Spacer(modifier = Modifier.width(11.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text("BLOKD", fontSize = 17.sp, fontWeight = FontWeight.Black, letterSpacing = 1.2.sp)
+            Text(
+                text = buildAnnotatedString {
+                    append("BLOKD")
+                    withStyle(SpanStyle(color = BlokdOrange)) { append(".") }
+                },
+                fontSize = 17.sp,
+                fontWeight = FontWeight.Black,
+                letterSpacing = 1.2.sp,
+            )
             Text("Private DNS ad blocker", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }

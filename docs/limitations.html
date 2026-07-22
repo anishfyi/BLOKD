@@ -26,17 +26,17 @@
     <div class="card">
       <ul>
         <li><b>Server-side ad insertion (SSAI):</b> ads served from the same host as video content</li>
-        <li><b>Encrypted DNS bypass:</b> apps using hardcoded DoH/DoT or resolver IPs</li>
+        <li><b>Custom encrypted resolvers:</b> an app using an obscure DoH/DoT endpoint that is not on the block list can still evade filtering. v1.2.0 blocks known providers and intercepts common hardcoded resolver IPs, but cannot catch every private one</li>
         <li><b>First-party ads:</b> content served from the app's own domain</li>
         <li><b>Non-DNS connections:</b> direct IP connections that never query blocked names</li>
       </ul>
     </div>
 
-    <h2>What v1.1.0 does not do</h2>
+    <h2>What v1.2.0 does not do</h2>
     <div class="card">
       <ul>
         <li>Full-tunnel traffic interception (Berserk is aggressive blocklists only)</li>
-        <li>Blocking port 853 (DoT) or 784 (DoQ) at the packet level</li>
+        <li>Universal port 853 (DoT) or 784 (DoQ) blocking (only DNS aimed at well-known public resolver IPs is intercepted)</li>
         <li>Root-level hosts file or system-wide firewall rules</li>
       </ul>
       <p style="margin:12px 0 0;">Full-tunnel Berserk is planned for a future release.</p>
