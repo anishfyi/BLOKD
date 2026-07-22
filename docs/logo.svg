@@ -1,7 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" role="img" aria-label="BLOKD">
-  <title>BLOKD</title>
-  <rect width="108" height="108" fill="#0E0D0C"/>
-  <path fill="none" stroke="#F3EEE6" stroke-opacity="0.2" stroke-width="1.1"
-        d="M54 24.5 L77 34 V53.5 C77 68.5 64.5 80.5 54 86.5 C43.5 80.5 31 68.5 31 53.5 V34 Z"/>
-  <path fill="#F3EEE6" d="M30.09 81.5V80.04H54.77Q57.79 80.04 60.16 78.35Q62.53 76.65 63.87 73.45Q65.22 70.26 65.22 65.82Q65.22 61.38 63.87 58.67Q62.53 55.96 60.16 54.73Q57.79 53.5 54.77 53.5H46.55V52.53H57.04Q62.87 52.53 67.59 53.87Q72.31 55.22 75.11 58.28Q77.91 61.34 77.91 66.57Q77.91 74.71 72.41 78.1Q66.9 81.5 57.04 81.5ZM36.85 80.83V26.17H48.46V80.83ZM46.55 52.98V52H54.02Q56.67 52 58.89 50.89Q61.11 49.77 62.44 47.15Q63.76 44.54 63.76 40.1Q63.76 35.65 62.44 32.74Q61.11 29.83 58.89 28.39Q56.67 26.96 54.02 26.96H30.09V25.5H55.55Q64.85 25.5 70.28 28.77Q75.71 32.03 75.71 39.31Q75.71 46.29 70.56 49.64Q65.41 52.98 55.55 52.98Z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="116" fill="#0b0b0b"/>
+  <g fill="#f7f7f7">
+    <rect x="150" y="112" width="66" height="288" rx="16"/>
+    <path d="M 188 112 H 300 A 74 74 0 0 1 300 260 H 188 Z"/>
+    <path d="M 188 252 H 300 A 76 76 0 0 1 300 400 H 188 Z"/>
+  </g>
+  <g fill="#0b0b0b">
+    <!-- top counter: lower edge is a diagonal sloping down to the left -->
+    <path d="M 212 152 H 296 V 218 L 212 262 Z"/>
+    <!-- bottom counter: upper edge is a parallel diagonal (same slope) -->
+    <path d="M 212 292 L 296 250 V 360 H 212 Z"/>
+  </g>
 </svg>
