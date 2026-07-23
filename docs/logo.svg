@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="BLOKD">
   <rect width="512" height="512" rx="116" fill="#000000"/>
-  <g transform="translate(-40,0)">
+  <g transform="translate(-24,0)">
     <g fill="#FFFFFF">
       <rect x="150" y="112" width="66" height="288" rx="16"/>
       <path d="M 188 112 H 300 A 74 74 0 0 1 300 260 H 188 Z"/>
@@ -10,6 +10,6 @@
       <path d="M 212 152 H 296 V 218 L 212 262 Z"/>
       <path d="M 212 292 L 296 250 V 360 H 212 Z"/>
     </g>
-    <circle cx="412" cy="372" r="30" fill="#FF6B3D"/>
+    <circle cx="380" cy="372" r="30" fill="#FF6B3D"/>
   </g>
 </svg>

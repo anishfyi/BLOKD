@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   BLOKD launcher foreground: geometric "B." monogram. White B with diagonal
-  counter cuts, orange period. Sized into the adaptive-icon safe zone so a
-  circular launcher mask does not clip the period.
+  counter cuts, orange period. Sized and centered in the adaptive-icon safe
+  zone so it reads bold and a circular launcher mask does not clip the period.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
@@ -11,10 +11,10 @@
     android:viewportHeight="108">
 
     <group
-        android:scaleX="0.176"
-        android:scaleY="0.176"
-        android:translateX="4.6"
-        android:translateY="7.4">
+        android:scaleX="0.20"
+        android:scaleY="0.20"
+        android:translateX="-2.4"
+        android:translateY="2.8">
 
         <!-- Stem -->
         <path
@@ -40,6 +40,6 @@
         <!-- Period -->
         <path
             android:fillColor="@color/brand_orange"
-            android:pathData="M392,331 a29,29 0 1 0 0,58 a29,29 0 1 0 0,-58 Z" />
+            android:pathData="M380,332 a28,28 0 1 0 0,56 a28,28 0 1 0 0,-56 Z" />
     </group>
 </vector>
