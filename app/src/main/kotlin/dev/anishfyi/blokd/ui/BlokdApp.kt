@@ -378,7 +378,7 @@ private fun SessionStatsPanel(protection: ProtectionState) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                "CNAME ${protection.stats.blockedCname} · Failed ${protection.stats.failed}",
+                "CNAME ${protection.stats.blockedCname} · Cached ${protection.stats.cacheHits} · Failed ${protection.stats.failed}",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 11.sp,
             )

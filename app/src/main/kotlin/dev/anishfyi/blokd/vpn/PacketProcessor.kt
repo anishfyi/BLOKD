@@ -1,5 +1,6 @@
 package dev.anishfyi.blokd.vpn
 
+import dev.anishfyi.blokd.dns.DnsCache
 import dev.anishfyi.blokd.dns.DnsCodec
 import dev.anishfyi.blokd.dns.DnsFilter
 import dev.anishfyi.blokd.dns.DnsResolver
@@ -14,6 +15,7 @@ class PacketProcessor(
     private val filter: DnsFilter,
     private val resolver: DnsResolver,
     private val stats: StatsCounter,
+    private val cache: DnsCache = DnsCache(),
 ) {
     fun process(packet: ByteArray, length: Int): ByteArray? {
         if (length < 28) return null
@@ -67,6 +69,11 @@ class PacketProcessor(
             return DnsCodec.buildNxDomainResponse(query)
         }
 
+        cache.get(query)?.let {
+            stats.onCacheHit()
+            return it
+        }
+
         val upstream = resolver.resolve(query)
         if (upstream == null) {
             stats.onFailed()
@@ -76,6 +83,7 @@ class PacketProcessor(
             stats.onBlockedCname()
             return DnsCodec.buildNxDomainResponse(query)
         }
+        cache.put(query, upstream)
         stats.onAllowed()
         return upstream
     }
