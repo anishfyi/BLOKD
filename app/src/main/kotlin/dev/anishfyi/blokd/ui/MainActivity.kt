@@ -41,6 +41,8 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.RequestPermission(),
     ) { /* optional */ }
 
+    private val allowRepo by lazy { BlocklistRepository(this, DnsFilter()) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen().setKeepOnScreenCondition { keepSplashVisible }
         super.onCreate(savedInstanceState)
@@ -57,6 +59,9 @@ class MainActivity : ComponentActivity() {
                     onToggle = { enabled -> if (enabled) enableVpn() else disableVpn() },
                     onSettingsChanged = ::restartVpnIfRunning,
                     onUpdateLists = ::enqueueBlocklistUpdate,
+                    initialAllowlist = remember { allowRepo.userAllowList().sorted() },
+                    onAddAllow = ::addAllow,
+                    onRemoveAllow = ::removeAllow,
                 )
             }
             LaunchedEffect(Unit) {
@@ -111,5 +116,15 @@ class MainActivity : ComponentActivity() {
     private fun enqueueBlocklistUpdate() {
         val request = OneTimeWorkRequestBuilder<BlocklistUpdateWorker>().build()
         WorkManager.getInstance(this).enqueue(request)
+    }
+
+    private fun addAllow(domain: String) {
+        allowRepo.setAllowList(allowRepo.userAllowList() + domain)
+        restartVpnIfRunning()
+    }
+
+    private fun removeAllow(domain: String) {
+        allowRepo.setAllowList(allowRepo.userAllowList() - domain)
+        restartVpnIfRunning()
     }
 }

@@ -46,14 +46,15 @@ class BlocklistRepository(
         domainCount = filter.blockedCount(),
     )
 
-    fun loadAllowList(): Set<String> {
-        val user = if (allowFile.exists()) {
+    fun loadAllowList(): Set<String> = userAllowList() + BlocklistSources.CONNECTIVITY_ALLOW
+
+    /** Just the user-added allow entries, excluding the built-in connectivity set. */
+    fun userAllowList(): Set<String> =
+        if (allowFile.exists()) {
             allowFile.readLines().map { it.trim().lowercase() }.filter { it.isNotEmpty() }.toSet()
         } else {
             emptySet()
         }
-        return user + BlocklistSources.CONNECTIVITY_ALLOW
-    }
 
     fun setAllowList(domains: Set<String>) {
         val withoutSystem = domains.filter { it !in BlocklistSources.CONNECTIVITY_ALLOW }.toSet()

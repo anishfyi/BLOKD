@@ -27,9 +27,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -68,6 +70,9 @@ fun BlokdApp(
     onToggle: (Boolean) -> Unit,
     onSettingsChanged: () -> Unit,
     onUpdateLists: () -> Unit,
+    initialAllowlist: List<String> = emptyList(),
+    onAddAllow: (String) -> Unit = {},
+    onRemoveAllow: (String) -> Unit = {},
 ) {
     val context = LocalContext.current
     val protection by VpnController.state.collectAsStateWithLifecycle()
@@ -77,6 +82,7 @@ fun BlokdApp(
     var mode by remember(context) {
         mutableStateOf(DnsPreferences.protectionMode(context))
     }
+    var allowlist by remember { mutableStateOf(initialAllowlist) }
 
     BlokdTheme {
         BlokdHome(
@@ -95,8 +101,28 @@ fun BlokdApp(
                 onSettingsChanged()
             },
             onUpdateLists = onUpdateLists,
+            allowlist = allowlist,
+            onAddAllow = { raw ->
+                val d = normalizeDomain(raw)
+                if (d != null && d !in allowlist) {
+                    onAddAllow(d)
+                    allowlist = (allowlist + d).sorted()
+                }
+            },
+            onRemoveAllow = { d ->
+                onRemoveAllow(d)
+                allowlist = allowlist - d
+            },
         )
     }
+}
+
+private val DOMAIN_REGEX = Regex("^[a-z0-9_-]+(\\.[a-z0-9_-]+)+$")
+
+/** Trim, lowercase, and validate a user-entered domain, or null if it is not one. */
+private fun normalizeDomain(raw: String): String? {
+    val d = raw.trim().lowercase().trimEnd('.')
+    return if (DOMAIN_REGEX.matches(d)) d else null
 }
 
 @Composable
@@ -108,6 +134,9 @@ private fun BlokdHome(
     onModeChange: (ProtectionMode) -> Unit,
     onAdGuardChange: (Boolean) -> Unit,
     onUpdateLists: () -> Unit,
+    allowlist: List<String>,
+    onAddAllow: (String) -> Unit,
+    onRemoveAllow: (String) -> Unit,
 ) {
     val running = protection.status == HealthStatus.HEALTHY ||
         protection.status == HealthStatus.DEGRADED ||
@@ -183,6 +212,13 @@ private fun BlokdHome(
                 upstream = protection.upstreamLabel,
                 onAdGuardChange = onAdGuardChange,
                 onUpdateLists = onUpdateLists,
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+            AllowlistCard(
+                entries = allowlist,
+                onAdd = onAddAllow,
+                onRemove = onRemoveAllow,
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -399,6 +435,71 @@ private fun LimitsCard() {
 }
 
 @Composable
+private fun AllowlistCard(
+    entries: List<String>,
+    onAdd: (String) -> Unit,
+    onRemove: (String) -> Unit,
+) {
+    var input by remember { mutableStateOf("") }
+    PanelCard {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("Allowlist", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+            Text(
+                "Domains you never want blocked. Applied on top of every list.",
+                fontSize = 11.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                OutlinedTextField(
+                    value = input,
+                    onValueChange = { input = it },
+                    placeholder = { Text("example.com", fontSize = 13.sp) },
+                    singleLine = true,
+                    modifier = Modifier.weight(1f),
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                TextButton(
+                    onClick = {
+                        onAdd(input)
+                        input = ""
+                    },
+                    enabled = input.isNotBlank(),
+                ) {
+                    Text("Add")
+                }
+            }
+            if (entries.isEmpty()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    "No custom entries yet.",
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            } else {
+                entries.forEach { domain ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(domain, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                        Text(
+                            "Remove",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.clickable { onRemove(domain) },
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun PanelCard(content: @Composable () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -512,6 +613,9 @@ private fun BlokdHomePreview() {
             onModeChange = {},
             onAdGuardChange = {},
             onUpdateLists = {},
+            allowlist = listOf("analytics.example.com"),
+            onAddAllow = {},
+            onRemoveAllow = {},
         )
     }
 }
