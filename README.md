@@ -12,27 +12,27 @@ It runs a local DNS-only VPN on your device and answers DNS for known ad and tra
 
 ---
 
-## What's new in v1.1.3
+## What's new in v1.5.0
 
-- **560k+ bundled blocklist** (HaGeZi + OISD) on first install, with daily CDN refresh via WorkManager
-- **Dual-stack IPv4/IPv6 VPN:** fixes false "no internet" warnings while browsing still works
-- **Standard / Berserk modes:** Berserk adds the full HaGeZi Pro list (aggressive DNS blocking, not full-tunnel)
-- **CNAME cloaking filter:** blocks upstream answers that chain to tracker domains
-- **Async resolver** with AdGuard DoT + system DNS fallback; SERVFAIL instead of silent drops
-- **Redesigned UI:** health banner, mode cards, live session stats
+- **Anti-bypass:** blocks apps' and browsers' own DoH/DoT resolvers and routes hardcoded public DNS (8.8.8.8, 1.1.1.1, Quad9, OpenDNS) into the tunnel, so far fewer apps can escape filtering
+- **Encrypted-only fallback:** AdGuard DoT with an independent Mullvad DoT backup, so protection never silently drops to unfiltered DNS; a degraded state shows when it falls back
+- **In-app allowlist:** add or remove domains you never want blocked, right from the app
+- **DNS cache** for faster repeat lookups, plus **pooled DoT connections** so a page's lookups run in parallel
+- **560k+ bundled blocklist** (HaGeZi + OISD), daily CDN refresh, Standard / Berserk modes, dual-stack IPv4/IPv6, CNAME-cloak filter
+- **New "B." app icon** and refreshed UI
 
 Site: https://anishfyi.github.io/BLOKD/ · [Modes](docs/modes.html) · [Install](docs/install.html) · [Limitations](docs/limitations.html)
 
 ## Pointers
 
-- No root, no account. DNS queries go to your chosen upstream (AdGuard DoT or system DNS).
+- No root, no account. Encrypted AdGuard DNS-over-TLS by default, with an independent encrypted fallback.
 - Blocks ad and tracker domains system-wide using public block lists, updatable in app.
-- Optional encrypted AdGuard DNS-over-TLS adds a second filtering layer.
-- One main button starts every enabled protection layer, with live blocked and allowed counters.
+- Anti-bypass: blocks apps' own DoH/DoT and intercepts hardcoded public resolvers.
+- One main button starts protection, with an in-app allowlist and live blocked and allowed counters.
 
 ## Install
 
-1. Download [BLOKD-v1.1.3.apk](https://github.com/anishfyi/BLOKD/releases/download/v1.1.3/BLOKD-v1.1.3.apk) or browse [all releases](https://github.com/anishfyi/BLOKD/releases/tag/v1.1.3).
+1. Download [BLOKD-v1.5.0.apk](https://github.com/anishfyi/BLOKD/releases/download/v1.5.0/BLOKD-v1.5.0.apk) or browse [all releases](https://github.com/anishfyi/BLOKD/releases/tag/v1.5.0).
 2. Open it and allow install from your browser or files app.
 3. Launch BLOKD, pick Standard or Berserk, flip the switch, and approve the VPN prompt.
 
@@ -48,7 +48,7 @@ Release builds are signed by CI from repository secrets. See `.github/workflows/
 
 ## Limitations
 
-DNS blocking cannot remove ads stitched into a video stream from the same server as the content (server-side ad insertion). It also cannot see apps that use encrypted DNS (DoH/DoT) or hardcoded resolver IPs. Berserk in v1.1.0 means bigger blocklists, not full-tunnel interception. See [limitations](docs/limitations.html) and `docs/ott-sonyliv-findings.md`.
+DNS blocking cannot remove ads stitched into a video stream from the same server as the content (server-side ad insertion). BLOKD now blocks known DoH/DoT resolvers and intercepts common hardcoded resolver IPs, but a custom or obscure encrypted resolver can still evade it. Berserk means bigger blocklists, not full-tunnel interception. See [limitations](docs/limitations.html) and `docs/ott-sonyliv-findings.md`.
 
 ## Star
 
