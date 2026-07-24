@@ -39,7 +39,8 @@ class ResolverManager(
         protectTcp(socket)
     }
 
-    private val primaryDot = DnsOverTlsResolver(protect = protectTls)
+    private val primaryDot: DnsResolver =
+        DnsOverTlsPool(PRIMARY_POOL_SIZE) { DnsOverTlsResolver(protect = protectTls) }
 
     /**
      * Independent encrypted ad-filtering fallback. A different operator from the
@@ -141,5 +142,8 @@ class ResolverManager(
 
     companion object {
         const val QUERY_BUDGET_MS = 2_000L
+
+        /** Parallel AdGuard DoT connections so a burst of lookups does not serialize. */
+        const val PRIMARY_POOL_SIZE = 4
     }
 }
